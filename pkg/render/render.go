@@ -20,12 +20,13 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
-func AddDafaultData(td *models.TemplateDate) *models.TemplateDate {
+func AddDefaultData(td *models.TemplateData) *models.TemplateData {
+
 	return td
 }
 
 // RenderTemplate renders a template
-func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateDate) {
+func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
 	var tc map[string]*template.Template
 
 	if app.UseCache {
@@ -42,7 +43,7 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateDate)
 
 	buf := new(bytes.Buffer)
 
-	td = AddDafaultData(td)
+	td = AddDefaultData(td)
 
 	_ = t.Execute(buf, td)
 
