@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/justinas/nosurf"
-	"github.com/zmey56/bookings/pkg/config"
-	"github.com/zmey56/bookings/pkg/models"
+	"github.com/zmey56/bookings/internal/config"
+	"github.com/zmey56/bookings/internal/models"
 	"html/template"
 	"log"
 	"net/http"
@@ -21,6 +21,7 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
+// AddDefaultData adds data for all templates
 func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateData {
 	td.CSRFToken = nosurf.Token(r)
 	return td
