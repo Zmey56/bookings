@@ -21,7 +21,6 @@ var session *scs.SessionManager
 // main is the main function
 func main() {
 	err := run()
-
 	if err != nil {
 		log.Fatal(err)
 	}
