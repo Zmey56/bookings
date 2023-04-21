@@ -6,6 +6,7 @@ import (
 	"github.com/zmey56/bookings/internal/config"
 	"github.com/zmey56/bookings/internal/driver"
 	"github.com/zmey56/bookings/internal/forms"
+	"github.com/zmey56/bookings/internal/helpers"
 	"github.com/zmey56/bookings/internal/models"
 	"github.com/zmey56/bookings/internal/render"
 	"github.com/zmey56/bookings/internal/repository"
@@ -457,8 +458,13 @@ func (m *Repository) PostShowLogin(w http.ResponseWriter, r *http.Request) {
 
 	form := forms.New(r.PostForm)
 	form.Required("email", "password")
-	if !form.Valid() {
+	form.IsEmail("email")
 
+	if !form.Valid() {
+		render.Template(w, r, "login.page.tmpl", &models.TemplateData{
+			Form: form,
+		})
+		return
 	}
 
 	id, _, err := m.DB.Authenticate(email, password)
@@ -472,4 +478,39 @@ func (m *Repository) PostShowLogin(w http.ResponseWriter, r *http.Request) {
 	m.App.Session.Put(r.Context(), "user_id", id)
 	m.App.Session.Put(r.Context(), "flash", "Logged in successfully")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// Logout logs a user out
+func (m *Repository) Logout(w http.ResponseWriter, r *http.Request) {
+	_ = m.App.Session.Destroy(r.Context())
+	_ = m.App.Session.RenewToken(r.Context())
+
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+}
+
+func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
+	reservation, err := m.DB.AllReservations()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	data := make(map[string]interface{})
+	data["reservations"] = reservation
+
+	render.Template(w, r, "admin-dashboard.page.tmpl", &models.TemplateData{
+		Data: data,
+	})
+}
+
+func (m *Repository) AdminNewReservations(w http.ResponseWriter, r *http.Request) {
+	render.Template(w, r, "admin-new-reservation.page.tmpl", &models.TemplateData{})
+}
+
+func (m *Repository) AdminAllReservations(w http.ResponseWriter, r *http.Request) {
+	render.Template(w, r, "admin-all-reservation.page.tmpl", &models.TemplateData{})
+}
+
+func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Request) {
+	render.Template(w, r, "admin-reservation-calendar.page.tmpl", &models.TemplateData{})
 }
